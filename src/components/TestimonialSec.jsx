@@ -31,21 +31,13 @@ const TestimonialSec = () => {
         ease: 'back.out(1.2)',
         scrollTrigger: {
           trigger: section,
-          start: 'top 70%',
+          start: '20% center',
           toggleActions: 'play none none reverse',
         },
       })
       triggers.push(imgAnim.scrollTrigger)
 
-      // Continuous subtle rotate loop
-      const rotateAnim = gsap.to(centerImg, {
-        rotate: 3,
-        duration: 4,
-        yoyo: true,
-        repeat: -1,
-        ease: 'sine.inOut',
-      })
-      cleans.push(() => rotateAnim.kill())
+      
     }
 
     // Heading on left side
@@ -58,8 +50,8 @@ const TestimonialSec = () => {
         duration: 1.3,
         ease: 'power4.out',
         scrollTrigger: {
-          trigger: heading,
-          start: 'top 80%',
+          trigger: section,
+          start: '20% center',
           toggleActions: 'play none none reverse',
         },
       })
@@ -72,10 +64,10 @@ const TestimonialSec = () => {
       gsap.set(mainPara, { y: 30, opacity: 0, filter: 'blur(5px)' })
       const paraAnim = gsap.to(mainPara, {
         y: 0, opacity: 1, filter: 'blur(0px)',
-        duration: 1, delay: 0.2, ease: 'power3.out',
+        duration: 1, delay: 1, ease: 'power3.out',
         scrollTrigger: {
-          trigger: mainPara,
-          start: 'top 82%',
+          trigger: section,
+          start: '20% center',
           toggleActions: 'play none none reverse',
         },
       })
@@ -89,12 +81,12 @@ const TestimonialSec = () => {
       gsap.set(box, { x: fromLeft ? -60 : 60, opacity: 0, y: 20 })
       const boxAnim = gsap.to(box, {
         x: 0, y: 0, opacity: 1,
-        duration: 1.2,
-        delay: i * 0.15,
+        duration: 1.7,
+        delay: i * .6,
         ease: 'power4.out',
         scrollTrigger: {
-          trigger: box,
-          start: 'top 85%',
+          trigger: section,
+          start: '20% center',
           toggleActions: 'play none none reverse',
         },
       })
@@ -102,10 +94,10 @@ const TestimonialSec = () => {
 
       // Box hover lift
       box.addEventListener('mouseenter', () => {
-        gsap.to(box, { y: -8, boxShadow: '0 20px 60px rgba(255,255,255,0.08)', duration: 0.4, ease: 'power2.out' })
+        gsap.to(box, { y: -8, duration: 0.4, ease: 'power2.out' })
       })
       box.addEventListener('mouseleave', () => {
-        gsap.to(box, { y: 0, boxShadow: '0 0 0 rgba(0,0,0,0)', duration: 0.5, ease: 'power2.inOut' })
+        gsap.to(box, { y: 0, duration: 0.5, ease: 'power2.inOut' })
       })
     })
 
@@ -119,8 +111,8 @@ const TestimonialSec = () => {
         delay: Math.floor(i / 4) * 0.15 + (i % 4) * 0.08,
         ease: 'back.out(2)',
         scrollTrigger: {
-          trigger: star,
-          start: 'top 85%',
+          trigger: section,
+          start: '20% center',
           toggleActions: 'play none none reverse',
         },
       })
@@ -138,7 +130,57 @@ const TestimonialSec = () => {
       })
     })
 
+    // ── Heading: masked word-by-word reveal ──────────────────────────────────
+    const mainHeading = section.querySelector('.side-1 h2')
+    if (mainHeading) {
+      const words = (mainHeading.textContent || '').split(' ')
+      mainHeading.innerHTML = words.map(w =>
+        `<span style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.1">` +
+        `<span class="_wi" style="display:inline-block">${w}</span></span>`
+      ).join(' ')
+
+      const inner = mainHeading.querySelectorAll('._wi')
+      gsap.set(inner, { y: '105%', opacity: 0 })
+      const wordAnim = gsap.to(inner, {
+        y: '0%', opacity: 1,
+        duration: 0.8, ease: 'power4.out',
+        stagger: 0.06, delay: 1,
+        scrollTrigger: { trigger: section, start: '20% center', toggleActions: 'play none none reverse' }
+      })
+      triggers.push(wordAnim.scrollTrigger)
+    }
+
+    // ── Testimonial descriptions: fade + slide ──────────────────────────────
+    const testiDescs = section.querySelectorAll('.testi-desc')
+    gsap.set(testiDescs, { opacity: 0, y: 12 })
+    const descAnim = gsap.to(testiDescs, {
+      opacity: 1, y: 0,
+      stagger: 0.1, duration: 0.75, ease: 'power3.out',
+      scrollTrigger: { trigger: section, start: '20% center', toggleActions: 'play none none reverse' }
+    })
+    triggers.push(descAnim.scrollTrigger)
+
+    // ── User names and designations: fade ────────────────────────────────────
+    const names = section.querySelectorAll('.name')
+    gsap.set(names, { opacity: 0, y: 8 })
+    const nameAnim = gsap.to(names, {
+      opacity: 1, y: 0,
+      stagger: 0.12, duration: 0.6, ease: 'power3.out',
+      scrollTrigger: { trigger: section, start: '20% center', toggleActions: 'play none none reverse' }
+    })
+    triggers.push(nameAnim.scrollTrigger)
+
+    const desigs = section.querySelectorAll('.desig')
+    gsap.set(desigs, { opacity: 0, y: 6 })
+    const desigAnim = gsap.to(desigs, {
+      opacity: 1, y: 0,
+      stagger: 0.12, duration: 0.6, delay: 0.1, ease: 'power3.out',
+      scrollTrigger: { trigger: section, start: '20% center', toggleActions: 'play none none reverse' }
+    })
+    triggers.push(desigAnim.scrollTrigger)
+
     ScrollTrigger.refresh()
+    
 
     return () => {
       triggers.forEach((t) => t && t.kill())

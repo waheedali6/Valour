@@ -30,6 +30,7 @@ const bg = gsap.fromTo(bgEl,
       start: 'top bottom',
       end: 'bottom top',
       scrub: 1.5,
+      invalidateOnRefresh: true,
     },
   }
 )
@@ -41,7 +42,7 @@ triggers.push(bg.scrollTrigger)
       gsap.set(el, { opacity: 0, x: -50 })
       const a = gsap.to(el, {
         opacity: 1, x: 0, duration: 1.1, delay: i * 0.18, ease: 'power4.out',
-        scrollTrigger: { trigger: section, start: 'top 70%', toggleActions: 'play none none reverse' }
+        scrollTrigger: { trigger: section, start: 'top 70%', toggleActions: 'play none none reverse', invalidateOnRefresh: true, }
       })
       triggers.push(a.scrollTrigger)
     })
@@ -51,7 +52,7 @@ triggers.push(bg.scrollTrigger)
     if (ticker) {
       const a = gsap.to(ticker, {
         x: '-60%', ease: 'none',
-        scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: 1 }
+        scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: 1,invalidateOnRefresh: true, }
       })
       triggers.push(a.scrollTrigger)
     }
@@ -65,14 +66,6 @@ triggers.push(bg.scrollTrigger)
   return (
     <section className='know-sec know-split-sec' ref={sectionRef}>
       <div className='know-grain' />
-
-      {/* Film frame counter HUD */}
-      <div className='know-film-hud'>
-        <span className='know-film-label'>FRAME</span>
-        <span ref={frameNumRef} className='know-film-num'>0000</span>
-        <span className='know-film-label'>VALOUR/LUCENT</span>
-      </div>
-
       <div className='container position-relative' style={{ zIndex: 2 }}>
         <div className='row align-items-start'>
 

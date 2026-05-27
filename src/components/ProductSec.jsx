@@ -4,20 +4,24 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import { FiPlus } from 'react-icons/fi'
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { Autoplay } from 'swiper/modules'
+
 
 gsap.registerPlugin(ScrollTrigger)
 
 const ProductSec = () => {
   const sectionRef = useRef(null)
-  const perspRef   = useRef(null)
+  const perspRef = useRef(null)
 
   useEffect(() => {
     const section = sectionRef.current
-    const persp   = perspRef.current
+    const persp = perspRef.current
     if (!section || !persp) return
 
     const triggers = []
-    const cards    = section.querySelectorAll('.pro-card')
+    const cards = section.querySelectorAll('.pro-card')
 
     // ── 1. Initial hidden state ────────────────────────────────────
     gsap.set(cards, { y: 80, opacity: 0, scale: 0.94 })
@@ -34,39 +38,16 @@ const ProductSec = () => {
         trigger: section,
         start: 'top 65%',
         toggleActions: 'play none none reverse',
+        invalidateOnRefresh: true,
       },
     })
     triggers.push(reveal.scrollTrigger)
 
-    // ── 3. Global section 3D tilt on mouse ────────────────────────
-    const onMouseMove = (e) => {
-      const r    = persp.getBoundingClientRect()
-      const xPct = (e.clientX - r.left) / r.width  - 0.5
-      const yPct = (e.clientY - r.top)  / r.height - 0.5
-      gsap.to(persp, {
-        rotationY: xPct * 10,
-        rotationX: -yPct * 8,
-        transformPerspective: 1200,
-        duration: 0.8,
-        ease: 'power2.out',
-      })
-    }
-    const onMouseLeave = () => {
-      gsap.to(persp, {
-        rotationY: 0,
-        rotationX: 0,
-        duration: 1.2,
-        ease: 'elastic.out(1, 0.5)',
-      })
-    }
-    section.addEventListener('mousemove', onMouseMove)
-    section.addEventListener('mouseleave', onMouseLeave)
-
     // ── 4. Card hover: image levitate + shine sweep ───────────────
     cards.forEach((card) => {
-      const img   = card.querySelector('img')
+      const img = card.querySelector('img')
       const shine = card.querySelector('.card-shine')
-      const icon  = card.querySelector('svg')
+      const icon = card.querySelector('svg')
 
       card.addEventListener('mouseenter', () => {
         gsap.to(img, { y: -16, scale: 1.08, duration: 0.5, ease: 'power2.out' })
@@ -74,7 +55,7 @@ const ProductSec = () => {
           gsap.fromTo(
             shine,
             { x: '-120%', opacity: 0.6 },
-            { x: '220%',  opacity: 0.2, duration: 0.7, ease: 'power2.in' }
+            { x: '220%', opacity: 0.2, duration: 0.7, ease: 'power2.in' }
           )
         }
         if (icon) gsap.to(icon, { rotate: 135, scale: 1.3, duration: 0.4, ease: 'back.out(2)' })
@@ -98,6 +79,7 @@ const ProductSec = () => {
           trigger: section,
           start: 'top 80%',
           toggleActions: 'play none none reverse',
+          invalidateOnRefresh: true,
         },
       })
       triggers.push(a.scrollTrigger)
@@ -118,11 +100,20 @@ const ProductSec = () => {
 
         {/* perspective wrapper — wraps the row for 3D tilt */}
         <div ref={perspRef} style={{ transformStyle: 'preserve-3d' }}>
-          <div className="row">
-            <div className="col-md-4">
-              <div className="pro-card">
+          <Swiper
+          modules={[Autoplay]}
+            spaceBetween={40}
+            slidesPerView={3}
+            loop={true}
+            autoplay={{
+          delay:2000000,
+          disableOnInteraction: true,
+        }}
+          >
+            <SwiperSlide>
+              <div className="pro-card yellow-shadow">
                 <div className="card-shine" />
-                <img src="/images/watch-1.webp" alt="watch" />
+                <img src="/images/watch-1.png" alt="watch" />
                 <div className="details">
                   <div>
                     <h6>Lucent Collection</h6>
@@ -131,11 +122,12 @@ const ProductSec = () => {
                   <FiPlus />
                 </div>
               </div>
-            </div>
-            <div className="col-md-4">
-              <div className="pro-card">
+            </SwiperSlide>
+
+            <SwiperSlide>
+              <div className="pro-card blue-shadow">
                 <div className="card-shine" />
-                <img src="/images/watch-2.webp" alt="watch" />
+                <img src="/images/watch-2.png" alt="watch" />
                 <div className="details">
                   <div>
                     <h6>Lucent Collection</h6>
@@ -144,11 +136,12 @@ const ProductSec = () => {
                   <FiPlus />
                 </div>
               </div>
-            </div>
-            <div className="col-md-4">
-              <div className="pro-card">
+            </SwiperSlide>
+
+            <SwiperSlide>
+              <div className="pro-card green-shadow">
                 <div className="card-shine" />
-                <img src="/images/watch-3.webp" alt="watch" />
+                <img src="/images/watch-3.png" alt="watch" />
                 <div className="details">
                   <div>
                     <h6>Lucent Collection</h6>
@@ -157,8 +150,49 @@ const ProductSec = () => {
                   <FiPlus />
                 </div>
               </div>
-            </div>
-          </div>
+            </SwiperSlide>
+            <SwiperSlide>
+              <div className="pro-card yellow-shadow">
+                <div className="card-shine" />
+                <img src="/images/watch-1.png" alt="watch" />
+                <div className="details">
+                  <div>
+                    <h6>Lucent Collection</h6>
+                    <h5>Sunseeker Yellow</h5>
+                  </div>
+                  <FiPlus />
+                </div>
+              </div>
+            </SwiperSlide>
+
+            <SwiperSlide>
+              <div className="pro-card blue-shadow">
+                <div className="card-shine" />
+                <img src="/images/watch-2.png" alt="watch" />
+                <div className="details">
+                  <div>
+                    <h6>Lucent Collection</h6>
+                    <h5>Midnight Blue</h5>
+                  </div>
+                  <FiPlus />
+                </div>
+              </div>
+            </SwiperSlide>
+
+            <SwiperSlide>
+              <div className="pro-card green-shadow">
+                <div className="card-shine" />
+                <img src="/images/watch-3.png" alt="watch" />
+                <div className="details">
+                  <div>
+                    <h6>Lucent Collection</h6>
+                    <h5>Forest Green</h5>
+                  </div>
+                  <FiPlus />
+                </div>
+              </div>
+            </SwiperSlide>
+          </Swiper>
         </div>
 
       </div>

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
+import SplitType from 'split-type'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -15,9 +16,23 @@ const WatchSec = () => {
         const ctx = gsap.context(() => {
 
             // =========================
+            // SPLIT TEXT
+            // =========================
+
+            const heading = new SplitType('.watch-text h2', { types: 'lines,words,chars' })
+            const badge   = new SplitType('.watch-text span', { types: 'chars' })
+
+            // line clip setup
+            heading.lines?.forEach((line) => {
+                line.style.overflow = 'hidden'
+                line.style.display  = 'block'
+            })
+
+            // =========================
             // INITIAL STATES
             // =========================
 
+            // image (unchanged)
             gsap.set('.watch-parallax', {
                 y: 120,
                 rotate: -10,
@@ -26,67 +41,101 @@ const WatchSec = () => {
                 force3D: true,
             })
 
-            gsap.set('.watch-text > *', {
-                y: 80,
+            gsap.set('.watch-bg-zoom', { scale: 1.15 })
+
+            // badge chars
+            gsap.set(badge.chars, {
                 opacity: 0,
+                y: 14,
+                rotateX: -60,
             })
 
-            gsap.set('.watch-bg-zoom', {
-                scale: 1.15,
+            // heading chars
+            gsap.set(heading.chars, {
+                y: '110%',
+                opacity: 0,
+                rotateZ: 4,
+            })
+
+            // paragraph
+            gsap.set('.watch-text p', {
+                opacity: 0,
+                y: 30,
+                filter: 'blur(6px)',
             })
 
             // =========================
-            // MASTER TIMELINE
+            // IMAGE TIMELINE (scrub — unchanged)
             // =========================
 
-            const tl = gsap.timeline({
+            const imgTl = gsap.timeline({
                 scrollTrigger: {
                     trigger: sectionRef.current,
                     start: 'top 75%',
                     end: 'bottom center',
                     scrub: 1.2,
+                    invalidateOnRefresh: true,
                 }
             })
 
-            // IMAGE ENTRY
-            tl.to('.watch-parallax', {
-                y: 0,
-                rotate: 0,
-                scale: 1,
+            imgTl
+                .to('.watch-parallax', {
+                    y: 0,
+                    rotate: 0,
+                    scale: 1,
+                    opacity: 1,
+                    ease: 'power4.out',
+                }, 0)
+                .to('.watch-bg-zoom', {
+                    scale: 1,
+                    ease: 'none',
+                }, 0)
+
+            // =========================
+            // TEXT TIMELINE (fires based on scroll)
+            // =========================
+
+            const textTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: '20% center',
+                    toggleActions: 'play none none reverse',
+                    invalidateOnRefresh: true,
+                }
+            })
+
+            // BADGE chars cascade
+            textTl.to(badge.chars, {
                 opacity: 1,
-                ease: 'power4.out',
+                y: 0,
+                rotateX: 0,
+                stagger: 0.04,
+                duration: 1.6,
+                ease: 'power3.out',
             }, 0)
 
-            // TEXT ENTRY
-            tl.to('.watch-text > *', {
-                y: 0,
+            // HEADING chars slide up
+            textTl.to(heading.chars, {
+                y: '0%',
                 opacity: 1,
-                stagger: 0.12,
+                rotateZ: 0,
+                stagger: 0.025,
+                duration: 1.8,
                 ease: 'power4.out',
             }, 0.15)
 
-            // BG ZOOM
-            tl.to('.watch-bg-zoom', {
-                scale: 1,
-                ease: 'none',
-            }, 0)
+            // PARAGRAPH blur dissolve
+            textTl.to('.watch-text p', {
+                opacity: 1,
+                y: 0,
+                filter: 'blur(0px)',
+                duration: 1,
+                ease: 'power3.out',
+            }, 0.55)
 
             // =========================
-            // PARALLAX
+            // PARALLAX SCROLLERS (unchanged)
             // =========================
-
-            gsap.to('.watch-parallax', {
-                yPercent: 10,
-                rotateZ: 3,
-                ease: 'none',
-                force3D: true,
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 2,
-                }
-            })
 
             gsap.to('.watch-text', {
                 yPercent: 0,
@@ -94,9 +143,10 @@ const WatchSec = () => {
                 force3D: true,
                 scrollTrigger: {
                     trigger: sectionRef.current,
-                    start: 'top bottom',
+                    start: 'top 50%',
                     end: 'bottom top',
                     scrub: 1.5,
+                    invalidateOnRefresh: true,
                 }
             })
 
@@ -109,72 +159,12 @@ const WatchSec = () => {
                     start: 'top bottom',
                     end: 'bottom top',
                     scrub: true,
+                    invalidateOnRefresh: true,
                 }
-            })
-
-            // =========================
-            // FLOATING
-            // =========================
-
-            gsap.to('.watch-float', {
-                y: -22,
-                rotate: 2,
-                duration: 4,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut',
-                force3D: true,
-            })
-
-            // =========================
-            // SIDE DRIFT
-            // =========================
-
-            gsap.to('.watch-img-wrap', {
-                x: 18,
-                duration: 5,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut',
-                force3D: true,
-            })
-
-            // =========================
-            // LIGHT SWEEP
-            // =========================
-
-            gsap.fromTo(
-                '.watch-shine',
-                {
-                    yPercent: -10,
-                    xPercent: -250,
-                    opacity: 0,
-                },
-                {
-                    xPercent: 250,
-                    opacity: 1,
-                    duration: 2.5,
-                    ease: 'power2.inOut',
-                    repeat: -1,
-                    repeatDelay: 3,
-                }
-            )
-
-            // =========================
-            // GLOW PULSE
-            // =========================
-
-            gsap.to('.watch-glow', {
-                scale: 1.2,
-                opacity: 0.85,
-                duration: 3,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut',
-                force3D: true,
             })
 
         }, sectionRef)
+        
 
         return () => ctx.revert()
 
@@ -183,75 +173,46 @@ const WatchSec = () => {
     return (
         <section className='watch-sec' ref={sectionRef}>
 
-            {/* BACKGROUND */}
             <div className="watch-bg-zoom"></div>
-
-            {/* OVERLAY */}
             <div className="watch-overlay"></div>
 
             <div className="container">
-
                 <div className="row align-items-center">
 
-                    {/* IMAGE SIDE */}
+                    {/* IMAGE SIDE — untouched */}
                     <div className="col-lg-6">
-
                         <div className="watch-img-wrap">
-
-                            {/* GLOW */}
                             <div className="watch-glow"></div>
-
-                            {/* PARALLAX LAYER */}
                             <div className="watch-parallax">
-
-                                {/* FLOAT LAYER */}
                                 <div className="watch-float">
-
-                                    {/* SHINE */}
-                                    <div className="watch-shine"></div>
-
-                                    {/* IMAGE */}
                                     <img
-                                        src="/images/blue.webp"
+                                        src="/images/blue.png"
                                         alt="watch"
                                         className='img-fluid watch-img'
                                     />
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
 
                     {/* TEXT SIDE */}
                     <div className="col-lg-6 text-col">
-
                         <div className="watch-text">
-
-                            <span>
-                                NEW GENERATION
-                            </span>
-
+                            <span>NEW GENERATION</span>
                             <h2>
                                 Vibrant Colors Inspired
                                 By Light And Nature
                             </h2>
-
                             <p>
                                 Crafted with precision and inspired by
                                 natural gradients, the new collection
                                 delivers elegance through refined materials,
                                 immersive color depth, and timeless engineering.
                             </p>
-
                         </div>
-
                     </div>
 
                 </div>
-
             </div>
 
         </section>

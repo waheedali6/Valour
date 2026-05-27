@@ -1,3 +1,4 @@
+import CreativeVideoSection from "@/components/CreativeVideoSection";
 import Footer from "@/components/Footer";
 import FormSec from "@/components/FormSec";
 import Header from "@/components/Header";
@@ -16,6 +17,7 @@ export default function Home() {
    <KnowSec />
    <ProductSec />
    <ImgSecs />
+    <CreativeVideoSection />
    <WatchSec />
    <TestimonialSec />
    <FormSec />

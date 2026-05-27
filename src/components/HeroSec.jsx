@@ -16,9 +16,7 @@ const BLOB_PATHS = [
 function lerpPaths(a, b, t) {
   const numsA = a.match(/-?[\d.]+/g).map(Number)
   const numsB = b.match(/-?[\d.]+/g).map(Number)
-
   let i = 0
-
   return a.replace(/-?[\d.]+/g, () => {
     const v = numsA[i] + (numsB[i] - numsA[i]) * t
     i++
@@ -26,107 +24,124 @@ function lerpPaths(a, b, t) {
   })
 }
 
+const TEXT = 'VALOUR'
+const CHAR_DELAY = 360   // ms between each character appearing
+const CHAR_FADE = 500    // ms each character takes to fade in
+
 export default function HeroSec() {
   const canvasRef = useRef(null)
   const sectionRef = useRef(null)
   const blobRef = useRef(null)
 
-  // ── Canvas glitch reveal ─────────────────────────────────────────────
+  // ── Canvas ───────────────────────────────────────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
     const ctx = canvas.getContext('2d')
-
-    let W = 0
-    let H = 0
-
-    const text = 'VALOUR'
-
+    let W = 0, H = 0
     let raf
     let running = true
-    let frameCount = 0
+    const startTime = performance.now()
 
-    let glitchAmount = 0
-    let glitchDirection = 1
-    let phase = 'glitch'
+    // Per-character alpha targets
+    const charAlpha = new Array(TEXT.length).fill(0)
 
     const resizeCanvas = () => {
       W = canvas.offsetWidth
       H = canvas.offsetHeight
-
       const dpr = window.devicePixelRatio || 1
-
       canvas.width = W * dpr
       canvas.height = H * dpr
-
       canvas.style.width = `${W}px`
       canvas.style.height = `${H}px`
-
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
     resizeCanvas()
 
-    const draw = () => {
+    const draw = (time) => {
       if (!running) return
-
-      frameCount++
-
       ctx.clearRect(0, 0, W, H)
 
+      const elapsed = time - startTime
+      const cx = W / 2
+      const cy = H / 2
       const fontSize = Math.min(W * 0.22, 180)
 
-      // ── Animation phases ───────────────────────
-      if (frameCount === 180) phase = 'hold'
-      if (frameCount === 360) phase = 'fade'
-
-      if (phase === 'glitch') {
-        glitchAmount += 2 * glitchDirection
-
-        if (glitchAmount >= 15 || glitchAmount <= 0) {
-          glitchDirection *= -1
-        }
-      } else {
-        glitchAmount = 0
-      }
-
-      // ── Fade ONLY glitch layers ───────────────
-      const glitchOpacity =
-        phase === 'fade'
-          ? Math.max(0, 1 - (frameCount - 360) / 120)
-          : 1
-
-      // ── Text setup ────────────────────────────
       ctx.font = `700 ${fontSize}px "Times New Roman", serif`
-      ctx.textAlign = 'center'
+      ctx.textAlign = 'left'
       ctx.textBaseline = 'middle'
 
-      // Red glitch
-      ctx.fillStyle = `rgba(255,100,100,${glitchOpacity})`
-      ctx.fillText(
-        text,
-        W / 2 + glitchAmount,
-        H / 2 - 3
-      )
+      // Measure total text width to center the whole word
+      const totalWidth = ctx.measureText(TEXT).width
+      let startX = cx - totalWidth / 2
 
-      // Blue glitch
-      ctx.fillStyle = `rgba(100,100,255,${glitchOpacity})`
-      ctx.fillText(
-        text,
-        W / 2 - glitchAmount,
-        H / 2 + 3
-      )
+      // Update per-character alpha
+      TEXT.split('').forEach((_, i) => {
+        const charStart = i * CHAR_DELAY
+        const charElapsed = elapsed - charStart
+        charAlpha[i] = Math.min(Math.max(charElapsed / CHAR_FADE, 0), 1)
+        // ease out quad
+        charAlpha[i] = 1 - Math.pow(1 - charAlpha[i], 2)
+      })
 
-      // Permanent white text
-      ctx.fillStyle = 'rgba(255,255,255,1)'
-      ctx.fillText(text, W / 2, H / 2)
+      // All characters revealed?
+      const allRevealed = charAlpha[TEXT.length - 1] >= 1
+
+      // Draw each character
+      let x = startX
+      TEXT.split('').forEach((char, i) => {
+        const alpha = charAlpha[i]
+        if (alpha <= 0) {
+          x += ctx.measureText(char).width
+          return
+        }
+
+        // Slight drop-in: characters slide down into position
+        const offsetY = (1 - alpha) * 18
+
+        const grad = ctx.createLinearGradient(0, cy - fontSize * 0.5, 0, cy + fontSize * 0.5)
+        grad.addColorStop(0, `rgba(224,224,224,${alpha})`)
+        grad.addColorStop(0.4, `rgba(255,255,255,${alpha})`)
+        grad.addColorStop(0.7, `rgba(160,160,160,${alpha})`)
+        grad.addColorStop(1, `rgba(224,224,224,${alpha})`)
+
+        ctx.fillStyle = grad
+        ctx.fillText(char, x, cy + offsetY)
+
+        x += ctx.measureText(char).width
+      })
+
+      // Shimmer — only after all characters are visible
+      if (allRevealed) {
+        const sweepX = cx + Math.sin(time * 0.001) * (W * 0.5)
+        ctx.save()
+        ctx.globalCompositeOperation = 'source-atop'
+        const beam = ctx.createLinearGradient(sweepX - 80, 0, sweepX + 80, 0)
+        beam.addColorStop(0, 'rgba(255,255,255,0)')
+        beam.addColorStop(0.5, 'rgba(255,255,255,0.6)')
+        beam.addColorStop(1, 'rgba(255,255,255,0)')
+        ctx.fillStyle = beam
+        ctx.fillRect(0, 0, W, H)
+        ctx.restore()
+      }
+
+      // Seconds hand — starts after last char begins appearing
+      const handStart = (TEXT.length - 1) * CHAR_DELAY
+      const handElapsed = Math.max(elapsed - handStart, 0)
+      const handProgress = Math.min(handElapsed / 800, 1)
+      const handAlpha = 1 - Math.pow(1 - handProgress, 3)
+
+      const continuousAngle = (time * 0.001) % (Math.PI * 2) - Math.PI / 2
+      const revealAngle = -Math.PI / 2 + handProgress * Math.PI * 2
+      const angle = handProgress < 1 ? revealAngle : continuousAngle
+      const r = Math.min(W, H) * 0.36
 
       raf = requestAnimationFrame(draw)
     }
 
     raf = requestAnimationFrame(draw)
-
     window.addEventListener('resize', resizeCanvas)
 
     return () => {
@@ -136,49 +151,7 @@ export default function HeroSec() {
     }
   }, [])
 
-  // ── Blob morphing ────────────────────────────────────────────────
-  useEffect(() => {
-    const blob = blobRef.current
-    if (!blob) return
-
-    let raf
-    const duration = 3200
-
-    const tick = (now) => {
-      const total = BLOB_PATHS.length
-      const cycle = (now % (duration * total)) / duration
-
-      const current = Math.floor(cycle)
-      const next = (current + 1) % total
-
-      const t = cycle - current
-
-      // Smooth cubic easing
-      const eased =
-        t < 0.5
-          ? 4 * t * t * t
-          : 1 - Math.pow(-2 * t + 2, 3) / 2
-
-      blob.setAttribute(
-        'd',
-        lerpPaths(
-          BLOB_PATHS[current],
-          BLOB_PATHS[next],
-          eased
-        )
-      )
-
-      raf = requestAnimationFrame(tick)
-    }
-
-    blob.setAttribute('d', BLOB_PATHS[0])
-
-    raf = requestAnimationFrame(tick)
-
-    return () => cancelAnimationFrame(raf)
-  }, [])
-
-  // ── Scroll animations ────────────────────────────────────────────
+  // ── Scroll animations ────────────────────────────────────────────────
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
@@ -192,6 +165,7 @@ export default function HeroSec() {
           start: 'top top',
           end: 'bottom top',
           scrub: 2.2,
+          invalidateOnRefresh: true,
         },
       })
     }, section)
@@ -200,54 +174,20 @@ export default function HeroSec() {
   }, [])
 
   return (
-    <section
-      className='hero-sec hero-canvas-sec'
-      ref={sectionRef}
-    >
-      {/* Morphing blob */}
-      <svg
-        className='hero-blob-svg'
-        viewBox='0 0 500 500'
-        xmlns='http://www.w3.org/2000/svg'
-      >
-        <path
-          ref={blobRef}
-          fill='rgba(255,255,255,0.04)'
-        />
-      </svg>
-
-      {/* Vignette */}
-      <div className='hero-vignette' />
-
-      {/* Canvas */}
-      <canvas
-        ref={canvasRef}
-        className='hero-canvas'
+    <section className='hero-sec hero-canvas-sec' ref={sectionRef}>
+      <video 
+        className='hero-video-bg' 
+        autoPlay 
+        loop 
+        muted 
+        playsInline
+        src="/videos/hero-bg-video.mp4"
       />
 
-      {/* Corner metadata */}
-      <div className='hero-corner hero-corner-tl'>
-        <span className='hero-corner-label'>EST.</span>
-        <span className='hero-corner-val'>2024</span>
-      </div>
+      <div className='hero-vignette' />
 
-      <div className='hero-corner hero-corner-tr'>
-        <span className='hero-corner-label'>
-          COLLECTION
-        </span>
-        <span className='hero-corner-val'>
-          LUCENT
-        </span>
-      </div>
+      <canvas ref={canvasRef} className='hero-canvas' />
 
-      <div className='hero-corner hero-corner-br'>
-        <span className='hero-corner-label'>
-          SCROLL TO
-        </span>
-        <span className='hero-corner-val'>
-          EXPLORE ↓
-        </span>
-      </div>
     </section>
   )
 }
