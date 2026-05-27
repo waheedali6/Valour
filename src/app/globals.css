@@ -150,10 +150,9 @@ nav .side-box svg {
   overflow: hidden;
 }
 
-.know-bg-layer {
+.know-bg-layer { 
   position: absolute;
   inset: -20% 0;
-  /* oversized so yPercent shift never shows edges */
   background-image: url(/images/know-bg.jpg);
   background-position: center;
   background-size: cover;
