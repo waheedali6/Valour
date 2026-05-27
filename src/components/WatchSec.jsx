@@ -1,185 +1,202 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
 import SplitType from 'split-type'
 
-gsap.registerPlugin(ScrollTrigger)
-
 const WatchSec = () => {
-
     const sectionRef = useRef(null)
 
     useEffect(() => {
+        if (typeof window === 'undefined') return
 
-        const ctx = gsap.context(() => {
+        const section = sectionRef.current
+        if (!section) return
 
-            // =========================
-            // SPLIT TEXT
-            // =========================
+        // =========================
+        // SPLIT TEXT
+        // =========================
+        const heading = new SplitType('.watch-text h2', { types: 'lines,words,chars' })
+        const badge   = new SplitType('.watch-text span', { types: 'chars' })
 
-            const heading = new SplitType('.watch-text h2', { types: 'lines,words,chars' })
-            const badge   = new SplitType('.watch-text span', { types: 'chars' })
+        heading.lines?.forEach((line) => {
+            line.style.overflow = 'hidden'
+            line.style.display  = 'block'
+        })
 
-            // line clip setup
-            heading.lines?.forEach((line) => {
-                line.style.overflow = 'hidden'
-                line.style.display  = 'block'
+        // =========================
+        // INITIAL STATES
+        // =========================
+        const parallax  = section.querySelector('.watch-parallax')
+        const bgZoom    = section.querySelector('.watch-bg-zoom')
+        const paragraph = section.querySelector('.watch-text p')
+
+        // Image
+        Object.assign(parallax.style, {
+            transform:  'translateY(120px) rotate(-10deg) scale(1.2)',
+            opacity:    '0',
+            transition: 'none',
+            willChange: 'transform, opacity',
+        })
+
+        // BG
+        Object.assign(bgZoom.style, {
+            transform:  'scale(1.15)',
+            willChange: 'transform',
+        })
+
+        // Badge chars
+        badge.chars?.forEach((char) => {
+            Object.assign(char.style, {
+                opacity:    '0',
+                transform:  'translateY(14px) rotateX(-60deg)',
+                display:    'inline-block',
+                transition: 'none',
+                willChange: 'transform, opacity',
             })
+        })
 
-            // =========================
-            // INITIAL STATES
-            // =========================
-
-            // image (unchanged)
-            gsap.set('.watch-parallax', {
-                y: 120,
-                rotate: -10,
-                scale: 1.2,
-                opacity: 0,
-                force3D: true,
+        // Heading chars
+        heading.chars?.forEach((char) => {
+            Object.assign(char.style, {
+                opacity:    '0',
+                transform:  'translateY(110%) rotateZ(4deg)',
+                display:    'inline-block',
+                transition: 'none',
+                willChange: 'transform, opacity',
             })
+        })
 
-            gsap.set('.watch-bg-zoom', { scale: 1.15 })
+        // Paragraph
+        Object.assign(paragraph.style, {
+            opacity:    '0',
+            transform:  'translateY(30px)',
+            filter:     'blur(6px)',
+            transition: 'none',
+            willChange: 'transform, opacity',
+        })
 
-            // badge chars
-            gsap.set(badge.chars, {
-                opacity: 0,
-                y: 14,
-                rotateX: -60,
-            })
+        // =========================
+        // SCROLL PARALLAX (rAF)
+        // =========================
+        let ticking = false
 
-            // heading chars
-            gsap.set(heading.chars, {
-                y: '110%',
-                opacity: 0,
-                rotateZ: 4,
-            })
+        const onScroll = () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const rect     = section.getBoundingClientRect()
+                    const winH     = window.innerHeight
+                    const progress = Math.max(0, Math.min(1, -rect.top / (rect.height - winH || 1)))
 
-            // paragraph
-            gsap.set('.watch-text p', {
-                opacity: 0,
-                y: 30,
-                filter: 'blur(6px)',
-            })
+                    // bg parallax
+                    const bgY = progress * 8
+                    bgZoom.style.transform = `scale(1) translateY(${bgY}%)`
 
-            // =========================
-            // IMAGE TIMELINE (scrub — unchanged)
-            // =========================
+                    ticking = false
+                })
+                ticking = true
+            }
+        }
 
-            const imgTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: 'top 75%',
-                    end: 'bottom center',
-                    scrub: 1.2,
-                    invalidateOnRefresh: true,
-                }
-            })
+        window.addEventListener('scroll', onScroll, { passive: true })
 
-            imgTl
-                .to('.watch-parallax', {
-                    y: 0,
-                    rotate: 0,
-                    scale: 1,
-                    opacity: 1,
-                    ease: 'power4.out',
-                }, 0)
-                .to('.watch-bg-zoom', {
-                    scale: 1,
-                    ease: 'none',
-                }, 0)
+        // =========================
+        // IMAGE REVEAL (scroll-scrub via rAF)
+        // =========================
+        let imgAnimated = false
 
-            // =========================
-            // TEXT TIMELINE (fires based on scroll)
-            // =========================
+        const imgObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && !imgAnimated) {
+                        imgAnimated = true
 
-            const textTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: '20% center',
-                    toggleActions: 'play none none reverse',
-                    invalidateOnRefresh: true,
-                }
-            })
+                        Object.assign(parallax.style, {
+                            transition: 'transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease',
+                            transform:  'translateY(0px) rotate(0deg) scale(1)',
+                            opacity:    '1',
+                        })
 
-            // BADGE chars cascade
-            textTl.to(badge.chars, {
-                opacity: 1,
-                y: 0,
-                rotateX: 0,
-                stagger: 0.04,
-                duration: 1.6,
-                ease: 'power3.out',
-            }, 0)
+                        Object.assign(bgZoom.style, {
+                            transition: 'transform 1.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                            transform:  'scale(1) translateY(0%)',
+                        })
+                    }
+                })
+            },
+            { threshold: 0.2, rootMargin: '0px 0px -10% 0px' }
+        )
 
-            // HEADING chars slide up
-            textTl.to(heading.chars, {
-                y: '0%',
-                opacity: 1,
-                rotateZ: 0,
-                stagger: 0.025,
-                duration: 1.8,
-                ease: 'power4.out',
-            }, 0.15)
+        imgObserver.observe(section)
 
-            // PARAGRAPH blur dissolve
-            textTl.to('.watch-text p', {
-                opacity: 1,
-                y: 0,
-                filter: 'blur(0px)',
-                duration: 1,
-                ease: 'power3.out',
-            }, 0.55)
+        // =========================
+        // TEXT REVEAL
+        // =========================
+        let textAnimated = false
 
-            // =========================
-            // PARALLAX SCROLLERS (unchanged)
-            // =========================
+        const textObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && !textAnimated) {
+                        textAnimated = true
 
-            gsap.to('.watch-text', {
-                yPercent: 0,
-                ease: 'none',
-                force3D: true,
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: 'top 50%',
-                    end: 'bottom top',
-                    scrub: 1.5,
-                    invalidateOnRefresh: true,
-                }
-            })
+                        // Badge chars stagger
+                        badge.chars?.forEach((char, i) => {
+                            setTimeout(() => {
+                                Object.assign(char.style, {
+                                    transition: 'transform 1.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.6s ease',
+                                    transform:  'translateY(0px) rotateX(0deg)',
+                                    opacity:    '1',
+                                })
+                            }, i * 40)
+                        })
 
-            gsap.to('.watch-bg-zoom', {
-                yPercent: 8,
-                ease: 'none',
-                force3D: true,
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: true,
-                    invalidateOnRefresh: true,
-                }
-            })
+                        // Heading chars stagger
+                        heading.chars?.forEach((char, i) => {
+                            setTimeout(() => {
+                                Object.assign(char.style, {
+                                    transition: 'transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.8s ease',
+                                    transform:  'translateY(0%) rotateZ(0deg)',
+                                    opacity:    '1',
+                                })
+                            }, 150 + i * 25)
+                        })
 
-        }, sectionRef)
-        
+                        // Paragraph
+                        setTimeout(() => {
+                            Object.assign(paragraph.style, {
+                                transition: 'transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease, filter 1s ease',
+                                transform:  'translateY(0px)',
+                                opacity:    '1',
+                                filter:     'blur(0px)',
+                            })
+                        }, 550)
+                    }
+                })
+            },
+            { threshold: 0.25, rootMargin: '0px 0px -15% 0px' }
+        )
 
-        return () => ctx.revert()
+        textObserver.observe(section)
+
+        // =========================
+        // CLEANUP
+        // =========================
+        return () => {
+            imgObserver.disconnect()
+            textObserver.disconnect()
+            window.removeEventListener('scroll', onScroll)
+            heading.revert()
+            badge.revert()
+        }
 
     }, [])
 
     return (
         <section className='watch-sec' ref={sectionRef}>
-
             <div className="watch-bg-zoom"></div>
             <div className="watch-overlay"></div>
-
             <div className="container">
                 <div className="row align-items-center">
-
-                    {/* IMAGE SIDE — untouched */}
                     <div className="col-lg-6">
                         <div className="watch-img-wrap">
                             <div className="watch-glow"></div>
@@ -194,8 +211,6 @@ const WatchSec = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* TEXT SIDE */}
                     <div className="col-lg-6 text-col">
                         <div className="watch-text">
                             <span>NEW GENERATION</span>
@@ -211,10 +226,8 @@ const WatchSec = () => {
                             </p>
                         </div>
                     </div>
-
                 </div>
             </div>
-
         </section>
     )
 }
