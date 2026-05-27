@@ -96,20 +96,38 @@ const ProductSec = () => {
   return (
     <section className='product-sec' ref={sectionRef}>
       <div className="container">
-        <h2>Provide You Best Watche Collection</h2>
+        <h2>Provide You Best Watch Collection</h2>
 
         {/* perspective wrapper — wraps the row for 3D tilt */}
         <div ref={perspRef} style={{ transformStyle: 'preserve-3d' }}>
           <Swiper
-          modules={[Autoplay]}
-            spaceBetween={40}
-            slidesPerView={3}
-            loop={true}
-            autoplay={{
-          delay:2000000,
-          disableOnInteraction: true,
-        }}
-          >
+  modules={[Autoplay]}
+  spaceBetween={40}
+  slidesPerView={1}
+  loop={true}
+  autoplay={{
+    delay: 2000000,
+    disableOnInteraction: true,
+  }}
+  breakpoints={{
+  640: {
+    slidesPerView: 1,
+    spaceBetween: 5,
+  },
+  768: {
+    slidesPerView: 2,
+    spaceBetween: 5,
+  },
+  1024: {
+    slidesPerView: 3,
+    spaceBetween: 5,  // below 1400 = 20
+  },
+  1400: {
+    slidesPerView: 3,
+    spaceBetween: 40,  // above 1400 = 40
+  },
+}}
+>
             <SwiperSlide>
               <div className="pro-card yellow-shadow">
                 <div className="card-shine" />

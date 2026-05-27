@@ -305,7 +305,7 @@ export default function FormSec() {
         <div className='row'>
 
           {/* Image col with spotlight */}
-          <div className='col-md-6' ref={imgColRef} style={{ position: 'relative' }}>
+          <div className='col-md-6 img-col' ref={imgColRef} style={{ position: 'relative' }}>
             <img src='/images/form-img.png' alt='' />
             <div ref={spotlightRef} className='form-spotlight' style={{
               position: 'absolute',

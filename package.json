@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"
@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
+    "@next/swc-win32-x64-msvc": "^16.2.6",
     "@studio-freight/lenis": "^1.0.42",
     "aos": "^2.3.4",
     "bootstrap": "^5.3.8",
