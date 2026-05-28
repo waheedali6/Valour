@@ -87,8 +87,8 @@ const Header = () => {
               </li>
             </ul>
           </div>
-          <a className="navbar-brand" href="#">
-            <img src="images/logo.png" alt="" />
+          <a className="navbar-brand" href="/">
+            <img src="/valour/images/logo.png" alt="" />
           </a>
           <div className="side-box">
             <a href="#" className='theme-btn'>English</a>

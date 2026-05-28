@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import { FiPlus } from 'react-icons/fi'
+import { getImagePath } from '@/lib/paths'
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Autoplay } from 'swiper/modules'
@@ -101,37 +102,37 @@ const ProductSec = () => {
         {/* perspective wrapper — wraps the row for 3D tilt */}
         <div ref={perspRef} style={{ transformStyle: 'preserve-3d' }}>
           <Swiper
-  modules={[Autoplay]}
-  spaceBetween={40}
-  slidesPerView={1}
-  loop={true}
-  autoplay={{
-    delay: 2000000,
-    disableOnInteraction: true,
-  }}
-  breakpoints={{
-  640: {
-    slidesPerView: 1,
-    spaceBetween: 5,
-  },
-  768: {
-    slidesPerView: 2,
-    spaceBetween: 5,
-  },
-  1024: {
-    slidesPerView: 3,
-    spaceBetween: 5,  // below 1400 = 20
-  },
-  1400: {
-    slidesPerView: 3,
-    spaceBetween: 40,  // above 1400 = 40
-  },
-}}
->
+            modules={[Autoplay]}
+            spaceBetween={40}
+            slidesPerView={1}
+            loop={true}
+            autoplay={{
+              delay: 2000,
+              disableOnInteraction: true,
+            }}
+            breakpoints={{
+              640: {
+                slidesPerView: 1,
+                spaceBetween: 5,
+              },
+              768: {
+                slidesPerView: 2,
+                spaceBetween: 5,
+              },
+              1024: {
+                slidesPerView: 3,
+                spaceBetween: 5,  // below 1400 = 20
+              },
+              1400: {
+                slidesPerView: 3,
+                spaceBetween: 40,  // above 1400 = 40
+              },
+            }}
+          >
             <SwiperSlide>
               <div className="pro-card yellow-shadow">
                 <div className="card-shine" />
-                <img src="/images/watch-1.png" alt="watch" />
+                <img src="/valour/images/watch-1.png" alt="watch" />
                 <div className="details">
                   <div>
                     <h6>Lucent Collection</h6>
@@ -145,7 +146,7 @@ const ProductSec = () => {
             <SwiperSlide>
               <div className="pro-card blue-shadow">
                 <div className="card-shine" />
-                <img src="/images/watch-2.png" alt="watch" />
+                <img src="/valour/images/watch-2.png" alt="watch" />
                 <div className="details">
                   <div>
                     <h6>Lucent Collection</h6>
@@ -159,7 +160,7 @@ const ProductSec = () => {
             <SwiperSlide>
               <div className="pro-card green-shadow">
                 <div className="card-shine" />
-                <img src="/images/watch-3.png" alt="watch" />
+                <img src="/valour/images/watch-3.png" alt="watch" />
                 <div className="details">
                   <div>
                     <h6>Lucent Collection</h6>
@@ -172,7 +173,7 @@ const ProductSec = () => {
             <SwiperSlide>
               <div className="pro-card yellow-shadow">
                 <div className="card-shine" />
-                <img src="/images/watch-1.png" alt="watch" />
+                <img src="/valour/images/watch-1.png" alt="watch" />
                 <div className="details">
                   <div>
                     <h6>Lucent Collection</h6>
@@ -186,7 +187,7 @@ const ProductSec = () => {
             <SwiperSlide>
               <div className="pro-card blue-shadow">
                 <div className="card-shine" />
-                <img src="/images/watch-2.png" alt="watch" />
+                <img src="/valour/images/watch-2.png" alt="watch" />
                 <div className="details">
                   <div>
                     <h6>Lucent Collection</h6>
@@ -200,7 +201,7 @@ const ProductSec = () => {
             <SwiperSlide>
               <div className="pro-card green-shadow">
                 <div className="card-shine" />
-                <img src="/images/watch-3.png" alt="watch" />
+                <img src="/valour/images/watch-3.png" alt="watch" />
                 <div className="details">
                   <div>
                     <h6>Lucent Collection</h6>

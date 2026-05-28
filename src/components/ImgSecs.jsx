@@ -7,21 +7,21 @@
 
 // const PANELS = [
 //   {
-//     src: '/images/img-sec-1.png',
+//     src: '/valour/images/img-sec-1.png',
 //     word: 'SUNSEEKER',
 //     sub: 'Golden Hour',
 //     num: '01',
 //     accent: '#c9a84c',
 //   },
 //   {
-//     src: '/images/img-sec-2.png',
+//     src: '/valour/images/img-sec-2.png',
 //     word: 'MIDNIGHT',
 //     sub: 'Deep Blue',
 //     num: '02',
 //     accent: '#7aa6ff',
 //   },
 //   {
-//     src: '/images/img-sec-3.png',
+//     src: '/valour/images/img-sec-3.png',
 //     word: 'NATURE',
 //     sub: 'Raw Earth',
 //     num: '03',
@@ -230,15 +230,15 @@
 // const sectionsData = [
 //   {
 //     image:
-//       '/images/img-sec-1.jpg',
+//       '/valour/valour/images/img-sec-1.jpg',
 //   },
 //   {
 //     image:
-//       '/images/img-sec-2.jpg',
+//       '/valour/valour/images/img-sec-2.jpg',
 //   },
 //   {
 //     image:
-//       '/images/img-sec-3.jpg',
+//       '/valour/valour/images/img-sec-3.jpg',
 //   },
 // ]
 
@@ -549,11 +549,11 @@ import { useEffect, useRef } from 'react'
 
 const sections = [
   {
-    src: '/videos/sec-video.mp4',
+    src: '/valour/videos/sec-video.mp4',
     type: 'video',
   },
   {
-    src: '/images/img-sec-1.png',
+    src: '/valour/images/img-sec-1.png',
     type: 'image',
   },
 ]
@@ -561,31 +561,36 @@ const sections = [
 export default function PremiumParallax() {
   const imageRefs = useRef([])
 
-  useEffect(() => {
-    const handleScroll = () => {
-      imageRefs.current.forEach((image) => {
-        if (!image) return
+ useEffect(() => {
+  const handleScroll = () => {
+    imageRefs.current.forEach((image) => {
+      if (!image) return
 
-        const section = image.closest('.luxury-section')
-        const rect = section.getBoundingClientRect()
-        const windowHeight = window.innerHeight
+      const section = image.closest('.luxury-section')
+      const rect = section.getBoundingClientRect()
+      const windowHeight = window.innerHeight
 
-        const progress = rect.top / windowHeight
-        const move = progress * 80
+      // Better scroll progress
+      const progress = rect.top / windowHeight
 
-        let scale = 1.25 - Math.abs(progress) * 0.15
-        scale = Math.max(1.08, Math.min(scale, 1.25))
+      // Parallax movement
+      const move = progress * 100
 
-        image.style.transform = `translateY(${move}px) scale(${scale})`
-      })
-    }
+      // Increased zoom effect
+      let scale = 1.25 - Math.abs(progress) * 0.25
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    
+      // Keep limits controlled
+      scale = Math.max(1, Math.min(scale, 1.25))
 
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+      image.style.transform = `translateY(${move}px) scale(${scale})`
+    })
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  handleScroll()
+
+  return () => window.removeEventListener('scroll', handleScroll)
+}, [])
 
   return (
     <main className="luxury-main">

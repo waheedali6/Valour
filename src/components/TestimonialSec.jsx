@@ -224,20 +224,20 @@ const TestimonialSec = () => {
                 <p className="testi-desc">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accu- santium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto.</p>
                 <div className="testi-bottom">
                   <div className="user-box">
-                    <img src="/images/testi-1.webp" alt="testi image" />
+                    <img src="/valour/images/testi-1.webp" alt="testi image" />
                     <div className="desc-box">
                       <h5 className="name">Egi Dasfara</h5>
                       <h6 className="desig">Client</h6>
                     </div>
                   </div>
-                  <img src="/images/colons.webp" alt="" />
+                  <img src="/valour/images/colons.png" alt="" />
                 </div>
               </div>
             </div>
           </div>
 
           <div className="col-md-2">
-            <img ref={centerImgRef} src="/images/testi-img.webp" alt="" className='center-img' />
+            <img ref={centerImgRef} src="/valour/images/testi-img.webp" alt="" className='center-img' />
           </div>
 
           <div className="col-md-5">
@@ -247,13 +247,13 @@ const TestimonialSec = () => {
                 <p className="testi-desc">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accu- santium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto.</p>
                 <div className="testi-bottom">
                   <div className="user-box">
-                    <img src="/images/testi-2.webp" alt="testi image" />
+                    <img src="/valour/images/testi-2.webp" alt="testi image" />
                     <div className="desc-box">
                       <h5 className="name">Egi Dasfara</h5>
                       <h6 className="desig">Client</h6>
                     </div>
                   </div>
-                  <img src="/images/colons.webp" alt="" />
+                  <img src="/valour/images/colons.png" alt="" />
                 </div>
               </div>
               <div className="testi-box testi-box3">
@@ -261,13 +261,13 @@ const TestimonialSec = () => {
                 <p className="testi-desc">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accu- santium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto.</p>
                 <div className="testi-bottom">
                   <div className="user-box">
-                    <img src="/images/testi-3.webp" alt="testi image" />
+                    <img src="/valour/images/testi-3.webp" alt="testi image" />
                     <div className="desc-box">
                       <h5 className="name">Egi Dasfara</h5>
                       <h6 className="desig">Client</h6>
                     </div>
                   </div>
-                  <img src="/images/colons.webp" alt="" />
+                  <img src="/valour/images/colons.png" alt="" />
                 </div>
               </div>
             </div>

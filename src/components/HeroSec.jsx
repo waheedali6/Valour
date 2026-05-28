@@ -181,7 +181,7 @@ export default function HeroSec() {
         loop 
         muted 
         playsInline
-        src="/videos/hero-bg-video.mp4"
+        src="/valour/videos/hero-bg-video.mp4"
       />
 
       <div className='hero-vignette' />

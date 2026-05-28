@@ -203,7 +203,7 @@ const WatchSec = () => {
                             <div className="watch-parallax">
                                 <div className="watch-float">
                                     <img
-                                        src="/images/blue.png"
+                                        src="/valour/images/blue.png"
                                         alt="watch"
                                         className='img-fluid watch-img'
                                     />

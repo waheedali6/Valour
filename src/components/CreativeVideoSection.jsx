@@ -27,9 +27,6 @@ export default function CreativeVideoSection() {
     const triggers = []
 
     const videoContainer = document.querySelector('.video-box')
-    const videoOverlay = document.querySelector('.video-overlay')
-    const overlayContent = document.querySelector('.video-content')
-    const overlayCaption = document.querySelector('.video-caption')
 
 
     const tl = gsap.timeline({
@@ -66,7 +63,7 @@ export default function CreativeVideoSection() {
           <div className="video-box">
             <video
               className="main-video"
-              src="/videos/scroll-video.mp4"
+              src="/valour/videos/scroll-video.mp4"
               autoPlay
               loop
               muted
